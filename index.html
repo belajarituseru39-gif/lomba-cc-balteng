@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lomba Cerdas Cermat Balteng 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .hidden { display: none !important; }
+        /* Custom scrollbar for question grid */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .animate-in { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+
+    <!-- SCREEN: LOGIN -->
+    <div id="screen-login" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="bg-blue-600 p-6 text-center text-white">
+                <i data-lucide="book-open" class="w-12 h-12 mx-auto mb-2 text-white"></i>
+                <h1 class="text-2xl font-bold">Lomba Cerdas Cermat Balteng 2026</h1>
+                <p class="text-blue-100 text-sm mt-1">Jenjang Sekolah Dasar</p>
+            </div>
+            <form id="login-form" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="h-5 w-5 text-slate-400"></i>
+                        </div>
+                        <input type="text" id="input-name" required class="pl-10 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Masukkan nama Anda">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Asal Sekolah</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="school" class="h-5 w-5 text-slate-400"></i>
+                        </div>
+                        <input type="text" id="input-school" required class="pl-10 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Contoh: SDN 011 Balikpapan Tengah">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Paket Ujian</label>
+                    <select id="input-package" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium">
+                        <!-- Options injected via JS -->
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md">
+                    Masuk Lomba
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCREEN: DASHBOARD -->
+    <div id="screen-dashboard" class="hidden min-h-screen p-4 md:p-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
+                <h1 class="text-xl font-bold">Konfirmasi Data Peserta</h1>
+                <button onclick="switchScreen('login')" class="flex items-center text-blue-100 hover:text-white transition">
+                    <i data-lucide="log-out" class="w-4 h-4 mr-1"></i> Kembali
+                </button>
+            </div>
+            <div class="p-6 md:p-10">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-slate-500">Nama Peserta</p>
+                            <p id="dash-name" class="text-lg font-semibold text-slate-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500">Asal Sekolah</p>
+                            <p id="dash-school" class="text-lg font-semibold text-slate-800"></p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-200">
+                            <p class="text-sm text-slate-500">Mata Ujian</p>
+                            <p id="dash-package" class="text-lg font-bold text-blue-700"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500">Jumlah Soal</p>
+                            <p id="dash-count" class="text-lg font-semibold text-slate-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500">Alokasi Waktu</p>
+                            <p id="dash-time" class="text-lg font-semibold text-slate-800"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <h3 class="font-bold text-blue-800 mb-3 flex items-center">
+                            <i data-lucide="alert-circle" class="w-5 h-5 mr-2"></i> Petunjuk Pengerjaan
+                        </h3>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li>Berdoalah sebelum memulai ujian.</li>
+                            <li>Ujian ini memuat soal Pilihan Ganda & Pilihan Ganda Kompleks (jawaban lebih dari satu).</li>
+                            <li>Anda dapat melompat ke soal lain menggunakan panel navigasi nomor di kanan.</li>
+                            <li>Waktu terus berjalan setelah Anda menekan tombol mulai.</li>
+                        </ul>
+                        <button onclick="startTest()" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-md">
+                            MULAI UJIAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: TEST -->
+    <div id="screen-test" class="hidden min-h-screen flex flex-col font-sans">
+        <header class="bg-blue-700 text-white shadow-md z-10 sticky top-0">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="book-open" class="w-6 h-6 hidden sm:block text-white"></i>
+                    <div>
+                        <h1 id="test-header-title" class="font-bold text-lg leading-tight">Lomba Cerdas Cermat Balteng 2026</h1>
+                        <p id="test-header-subtitle" class="text-xs text-blue-200"></p>
+                    </div>
+                </div>
+                <div class="bg-blue-800 px-4 py-2 rounded-lg flex items-center border border-blue-600 shadow-inner">
+                    <i data-lucide="clock" id="timer-icon" class="w-5 h-5 mr-2 text-blue-200"></i>
+                    <span id="timer-text" class="font-mono text-xl font-bold tracking-wider text-white">00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 container mx-auto p-4 flex flex-col lg:flex-row gap-6">
+            <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
+                    <span id="q-number" class="font-bold text-slate-700">Soal Nomor 1</span>
+                    <span id="q-badge" class="hidden text-xs font-bold text-white bg-orange-500 px-2 py-1 rounded">Jawaban Kompleks</span>
+                </div>
+                
+                <div class="p-6 md:p-8 flex-1 overflow-y-auto">
+                    <div id="q-image-container" class="hidden mb-6 flex flex-col items-center justify-center">
+                        <div id="q-image-loader" class="hidden py-6 text-sm text-slate-500 flex items-center gap-2">
+                            <div class="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                            <span>Memuat gambar...</span>
+                        </div>
+                        <img id="q-image" alt="Ilustrasi Soal" referrerpolicy="no-referrer" decoding="sync" loading="eager" class="max-h-72 max-w-full w-auto rounded-xl border border-slate-200 shadow-sm object-contain bg-slate-50 p-1">
+                    </div>
+
+                    <div id="q-text" class="text-lg text-slate-800 leading-relaxed whitespace-pre-wrap mb-8 text-justify">
+                        <!-- Question text here -->
+                    </div>
+                    
+                    <div id="q-options" class="space-y-3">
+                        <!-- Options generated here via JS -->
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                    <button id="btn-prev" onclick="prevQuestion()" class="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        <i data-lucide="chevron-left" class="w-5 h-5 mr-1"></i> SEBELUMNYA
+                    </button>
+                    
+                    <button id="btn-finish" onclick="showSubmitModal()" class="hidden items-center px-6 py-2 bg-green-600 border border-green-700 rounded-lg text-white font-bold hover:bg-green-700 shadow-md transition">
+                        <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i> SELESAI
+                    </button>
+                    
+                    <button id="btn-next" onclick="nextQuestion()" class="flex items-center px-4 py-2 bg-blue-600 border border-blue-700 rounded-lg text-white hover:bg-blue-700 transition">
+                        SELANJUTNYA <i data-lucide="chevron-right" class="w-5 h-5 ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-80 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col">
+                <div class="bg-slate-50 px-6 py-3 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-700">Daftar Soal</h3>
+                </div>
+                <div id="q-grid" class="p-4 grid grid-cols-5 gap-2 overflow-y-auto max-h-[50vh] lg:max-h-none">
+                    <!-- Grid buttons generated via JS -->
+                </div>
+                <div class="p-4 border-t border-slate-200 mt-auto bg-slate-50 rounded-b-xl">
+                    <div class="flex items-center mb-2 text-sm text-slate-600">
+                        <div class="w-4 h-4 bg-green-500 border border-green-600 rounded mr-2"></div>
+                        <span id="stat-answered">Sudah Dijawab: 0</span>
+                    </div>
+                    <div class="flex items-center text-sm text-slate-600">
+                        <div class="w-4 h-4 bg-white border border-slate-300 rounded mr-2"></div>
+                        <span id="stat-unanswered">Belum Dijawab: 0</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- MODAL KONFIRMASI -->
+        <div id="modal-submit" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in">
+                <div class="flex items-center justify-center w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full mx-auto mb-4">
+                    <i data-lucide="alert-circle" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-xl font-bold text-center text-slate-800 mb-2">Konfirmasi Selesai</h2>
+                <p class="text-center text-slate-600 mb-6">
+                    Apakah Anda yakin ingin menyelesaikan ujian ini? <br/>
+                    Masih ada <span id="modal-unanswered" class="font-bold text-red-600">0</span> soal kosong.
+                </p>
+                <div class="flex space-x-3">
+                    <button onclick="hideSubmitModal()" class="flex-1 py-3 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition">
+                        Kembali Cek Soal
+                    </button>
+                    <button onclick="submitTest()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md transition">
+                        Kumpulkan Ujian
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: SUBMITTING -->
+    <div id="screen-submitting" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 p-8 text-center">
+            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 class="text-xl font-bold text-slate-800">Menyimpan Hasil...</h2>
+            <p class="text-slate-500 mt-2">Mohon tunggu sebentar, nilai sedang dikirim ke server.</p>
+        </div>
+    </div>
+
+    <!-- SCREEN: RESULT -->
+    <div id="screen-result" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden text-center relative border border-slate-200">
+            <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 absolute top-0 left-0 w-full"></div>
+            <div class="relative pt-16 px-6 pb-8">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg mx-auto mb-4 border-4 border-slate-50">
+                    <i data-lucide="check-circle" class="w-12 h-12 text-green-500"></i>
+                </div>
+                
+                <h1 class="text-3xl font-black text-slate-800 mb-1">Ujian Selesai!</h1>
+                <p class="text-slate-500 mb-8">Terima kasih telah mengikuti Lomba Cerdas Cermat Balteng 2026.</p>
+
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100 mb-8 text-left">
+                    <table class="w-full text-sm">
+                        <tbody>
+                            <tr class="border-b border-slate-200">
+                                <td class="py-2 text-slate-500">Nama Lengkap</td>
+                                <td id="res-name" class="py-2 font-semibold text-slate-800 text-right"></td>
+                            </tr>
+                            <tr class="border-b border-slate-200">
+                                <td class="py-2 text-slate-500">Asal Sekolah</td>
+                                <td id="res-school" class="py-2 font-semibold text-slate-800 text-right"></td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 text-slate-500">Mata Ujian</td>
+                                <td id="res-package" class="py-2 font-semibold text-blue-700 text-right"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-center items-center gap-6 mb-8">
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500 uppercase tracking-wider mb-1">Benar</p>
+                        <p id="res-correct" class="text-3xl font-bold text-green-500">0</p>
+                    </div>
+                    <div class="w-px h-12 bg-slate-200"></div>
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500 uppercase tracking-wider mb-1">Salah/Kosong</p>
+                        <p id="res-wrong" class="text-3xl font-bold text-red-500">0</p>
+                    </div>
+                    <div class="w-px h-12 bg-slate-200"></div>
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500 uppercase tracking-wider mb-1">Nilai</p>
+                        <p id="res-score" class="text-4xl font-black text-blue-600">0</p>
+                    </div>
+                </div>
+
+                <button onclick="resetApp()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg transition duration-200">
+                    Kembali ke Halaman Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATABASE SOAL LENGKAP (30 SOAL CERDAS CERMAT) ---
+        const soalPackages = {
+          lcc_1: {
+            title: "Soal Cerdas Cermat",
+            duration: 120,
+            questions: [
+              // --- PKN PG ---
+              {
+                text: "Nilai-nilai Pancasila memiliki keterkaitan satu sama lain. Semua tindakan masyarakat yang sesuai dengan nilai Pancasila berdasarkan nilai Ketuhanan. Hal ini terjadi karena tindakan tersebut dilakukan atas dasar…",
+                options: [
+                  "Ketaqwaan kepada Tuhan Yang Maha Esa",
+                  "Rasa kemanusiaan masyarakat yang tinggi",
+                  "Keinginan menjujung tinggi persatuan dan kesatuan",
+                  "Keyakinan bahwa rakyat memegang kedaulatan tertinggi di Indonesia."
+                ],
+                answer: 0
+              },
+              {
+                text: "Kabupaten dan kota adalah wilayah otonom satu tingkat di bawah Provinsi, wilayah kota dipimpin oleh seorang…",
+                options: [
+                  "Bupati",
+                  "Camat",
+                  "Gubernur",
+                  "Wali kota"
+                ],
+                answer: 3
+              },
+              {
+                text: "Pemerintah membangun taman kota yang indah dengan berbagai fasilitas seperti bangku taman, area bermain anak, dan jalur lari. Setiap warga diperbolehkan datang untuk menikmati kesegaran udara dan bermain di sana secara gratis. Namun, setiap pengunjung dilarang membuang sampah sembarangan dan dilarang merusak tanaman yang ada. Pengunjung yang menaati aturan tersebut membantu menjaga taman tetap indah untuk dinikmati bersama.\n\nBerdasarkan ilustrasi di atas, tindakan menikmati fasilitas area bermain anak secara gratis merupakan bentuk dari ....",
+                options: [
+                  "Kewajiban warga negara",
+                  "Hak warga negara",
+                  "Larangan pemerintah",
+                  "Tanggung jawab sosial"
+                ],
+                answer: 1
+              },
+              {
+                text: "Dalam alinea keempat Pembukaan UUD NRI 1945, disebutkan salah satu tujuan negara adalah 'mencerdaskan kehidupan bangsa'. Hal ini dilakukan melalui program wajib belajar dan pemberian beasiswa bagi siswa berprestasi maupun yang kurang mampu.\n\nUpaya pemerintah memberikan pendidikan yang layak bagi seluruh warga negara sesuai dengan amanat Pembukaan UUD 1945 alinea ....",
+                options: [
+                  "Kesatu",
+                  "Kedua",
+                  "Ketiga",
+                  "Keempat"
+                ],
+                answer: 3
+              },
+              {
+                text: "Saat berjalan melewati sekumpulan orang tua yang sedang duduk di teras, Dimas menundukkan badan sedikit sambil mengucapkan 'permisi'. Tindakan Dimas tersebut membuat orang-orang tua itu tersenyum dan memujinya sebagai anak yang baik.\n\nApa yang dilakukan Dimas adalah penerapan dari norma ....",
+                options: [
+                  "Agama",
+                  "Hukum",
+                  "Kesopanan",
+                  "Kesusilaan"
+                ],
+                answer: 2
+              },
+
+              // --- BHS INDONESIA PG ---
+              {
+                text: "Desa Makmur baru saja meluncurkan program 'Saring Mandiri' untuk mengatasi krisis air bersih saat musim kemarau. Warga diajarkan membuat alat penyaring menggunakan botol bekas yang diisi lapisan ijuk, pasir halus, kerikil, dan arang aktif. Program ini tidak hanya menyediakan air bersih untuk kebutuhan mencuci, tetapi juga mengurangi sampah plastik di lingkungan desa. Ketua RW menyatakan bahwa biaya pembuatan alat ini sangat murah dibandingkan membeli air galon setiap hari. Selain itu, kejernihan air yang dihasilkan sudah memenuhi standar penggunaan rumah tangga non-konsumsi.\n\nBerdasarkan teks tersebut, dampak positif ganda yang dihasilkan dari program 'Saring Mandiri' adalah ....",
+                options: [
+                  "Meningkatkan pendapatan ekonomi desa melalui penjualan alat penyaring",
+                  "Menyediakan air layak minum sekaligus menghilangkan limbah industri",
+                  "Mengatasi kelangkaan air bersih dan mengurangi polusi sampah plastik",
+                  "Mempercepat proses penguapan air di musim kemarau bagi warga desa"
+                ],
+                answer: 2
+              },
+              {
+                text: "Teman-teman, menjaga kebersihan kelas bukan hanya tugas penjaga sekolah. Kelas adalah rumah kedua kita. Jika kelas bersih, kita akan belajar dengan nyaman tanpa gangguan bau tidak sedap atau nyamuk. Mari kita mulai dari hal kecil: tidak meninggalkan sampah di laci meja. Dengan begitu, kita telah menunjukkan rasa tanggung jawab kita sebagai pelajar.\n\nTujuan utama orator menyampaikan gagasan tersebut kepada teman-temannya adalah ....",
+                options: [
+                  "Menyuruh teman-teman membersihkan laci meja setiap jam pelajaran",
+                  "Menginformasikan bahwa penjaga sekolah sedang sakit sehingga kelas kotor",
+                  "Mengajak teman-teman untuk meningkatkan kesadaran menjaga kebersihan kelas",
+                  "Memperingatkan teman-teman tentang bahaya nyamuk di dalam laci meja"
+                ],
+                answer: 2
+              },
+              {
+                text: "Andi: 'Wah, selamat ya, Budi! Kamu berhasil menjuarai lomba mendongeng tingkat provinsi!'\nBudi: 'Terima kasih, Andi. Sebenarnya aku sempat grogi di panggung, tapi aku ingat latihan keras yang aku jalani setiap hari selama sebulan ini. Rasanya kerja kerasku terbayar lunas.'\n\nPerasaan Budi berdasarkan fakta keberhasilannya adalah ....",
+                options: [
+                  "Sangat bangga karena berhasil mengalahkan semua teman sekelasnya",
+                  "Merasa puas dan lega karena usahanya membuahkan hasil maksimal",
+                  "Cemas karena harus mewakili sekolah ke lomba tingkat nasional",
+                  "Sedih karena dia harus berlatih keras setiap hari tanpa istirahat"
+                ],
+                answer: 1
+              },
+              {
+                text: "1. Masukkan tanah subur ke dalam pot hingga setengah penuh.\n2. Siramlah secara teratur agar tanaman tumbuh dengan baik.\n3. Lubangi bagian tengah tanah lalu masukkan biji tanaman.\n4. Tutup kembali biji dengan tanah tipis dan letakkan di tempat teduh.\n\nUrutan yang tepat agar menjadi paragraf prosedur yang padu adalah ....",
+                options: [
+                  "1 - 3 - 4 - 2",
+                  "1 - 4 - 3 - 2",
+                  "3 - 1 - 4 - 2",
+                  "1 - 2 - 3 – 4"
+                ],
+                answer: 0
+              },
+              {
+                text: "Pohon jati kuat kayunya\nTumbuh subur di tanah hulu\nBarang siapa tekun membaca\nIlmu didapat manfaat selalu\n\nIsi atau amanat yang terkandung dalam pantun tersebut adalah ....",
+                options: [
+                  "Kayu jati sangat bermanfaat untuk membangun rumah",
+                  "Membaca buku secara tekun akan memberikan ilmu yang bermanfaat",
+                  "Hanya orang yang tinggal di hulu yang rajin membaca buku",
+                  "Menanam pohon jati akan membuat kita menjadi pintar"
+                ],
+                answer: 1
+              },
+
+              // --- MATEMATIKA PG ---
+              {
+                text: "Sebuah lembaga sosial mengumpulkan paket sembako untuk didistribusikan ke 12 desa yang terdampak banjir. Setiap desa akan menerima 4.250 paket bantuan yang berisi bahan pangan pokok. Koordinasi yang baik antara relawan dan pihak keamanan desa diperlukan agar proses distribusi berjalan lancar tanpa hambatan. Perhitungan jumlah total paket secara akurat sangat krusial untuk memastikan tidak ada warga yang terlewat dalam pembagian bantuan ini.\n\nJumlah total paket sembako yang harus disiapkan oleh lembaga sosial tersebut adalah ....",
+                options: [
+                  "50.000 paket",
+                  "51.000 paket",
+                  "52.000 paket",
+                  "53.000 paket"
+                ],
+                answer: 1
+              },
+              {
+                text: "Sebuah toko buku memberikan potongan harga khusus pada hari pendidikan nasional. Dalam brosur disebutkan bahwa setiap pembeli buku fiksi akan mendapatkan potongan harga sebesar 1/5 dari harga asli. Pengubahan bentuk pecahan ke persen sering dilakukan oleh pemilik toko agar promosi terlihat lebih menarik bagi pelanggan di papan iklan depan toko.\n\nBesarnya potongan harga jika dinyatakan dalam bentuk persen adalah ....",
+                options: [
+                  "10%",
+                  "15%",
+                  "20%",
+                  "25%"
+                ],
+                answer: 2
+              },
+              {
+                text: "Kereta api 'Ekspres Bangsa' berangkat dari Stasiun A pada pukul 08.15 dan tiba di Stasiun B pada pukul 11.45. Penumpang ingin mengetahui berapa lama mereka berada di dalam kereta untuk menyiapkan bekal selama perjalanan.\n\nDurasi waktu perjalanan kereta api tersebut adalah ....",
+                options: [
+                  "3 jam 30 menit",
+                  "3 jam 15 menit",
+                  "2 jam 30 menit",
+                  "4 jam 15 menit"
+                ],
+                answer: 0
+              },
+              {
+                text: "Dalam pelajaran geometri, siswa diminta mengukur sudut yang terbentuk dari lipatan kertas. Menggunakan busur derajat, salah satu kaki sudut berada di angka 0 dan kaki sudut lainnya menunjuk di antara angka 120 dan 130 tepat di garis tengahnya.\n\nBesar sudut yang diukur oleh siswa tersebut adalah ....",
+                options: [
+                  "125 derajat",
+                  "120 derajat",
+                  "130 derajat",
+                  "115 derajat"
+                ],
+                answer: 0
+              },
+              {
+                text: "Seorang desainer kemasan ingin membuat kotak kado berbentuk kubus dari selembar karton. Ia mencoba beberapa pola rangkaian persegi. Tidak semua rangkaian persegi dapat ditekuk menjadi kubus yang sempurna tanpa ada sisi yang tumpang tindih.\n\nPola rangkaian persegi yang dapat membentuk kubus disebut ....",
+                options: [
+                  "Jaring-jaring",
+                  "Kerangka",
+                  "Luas permukaan",
+                  "Volume"
+                ],
+                answer: 0
+              },
+
+              // --- IPAS PG ---
+              {
+                text: "Di sebuah ekosistem sawah, terdapat populasi padi, belalang, katak, dan ular. Suatu hari, petani menangkap banyak katak untuk dijual di pasar. Akibatnya, jumlah katak di sawah tersebut menurun drastis. Hal ini menyebabkan ketidakseimbangan pada rantai makanan yang ada di sawah tersebut karena katak merupakan predator alami bagi belalang.\n\nDampak yang akan terjadi pada populasi belalang akibat berkurangnya populasi katak secara drastis adalah ....",
+                options: [
+                  "Menurun karena tidak ada sumber makanan",
+                  "Meningkat karena predatornya berkurang",
+                  "Tetap stabil karena belalang memakan padi",
+                  "Menurun karena belalang dimangsa oleh ular"
+                ],
+                answer: 1
+              },
+              {
+                text: "Air di bumi selalu bergerak dalam sebuah siklus yang tidak pernah berhenti. Cahaya matahari memanasi air di laut, sungai, dan danau sehingga berubah menjadi uap air (evaporasi). Namun, penguapan tidak hanya terjadi pada badan air. Tumbuhan juga melepaskan uap air ke atmosfer melalui lubang-lubang kecil di daunnya setelah melakukan proses metabolisme.\n\nProses pelepasan uap air ke atmosfer yang berasal dari jaringan tumbuhan disebut ....",
+                options: [
+                  "Infiltrasi",
+                  "Kondensasi",
+                  "Presipitasi",
+                  "Transpirasi"
+                ],
+                answer: 3
+              },
+              {
+                text: "Andi sering kali melewatkan sarapan pagi karena terburu-buru berangkat ke sekolah. Saat jam istirahat, Andi lebih memilih membeli jajanan yang sangat pedas dan minuman bersoda. Kebiasaan ini sudah berlangsung selama beberapa minggu. Suatu hari, Andi merasakan nyeri yang luar biasa pada bagian perut atas, mual, dan merasa kembung. Setelah diperiksa oleh dokter, Andi didiagnosis mengalami peradangan pada lambung atau maag. Dokter menyarankan Andi untuk memperbaiki pola makan dan jenis makanan yang dikonsumsinya setiap hari agar organ pencernaannya kembali sehat.\n\nBerdasarkan situasi yang dialami Andi, langkah yang paling tepat untuk menjaga kesehatan organ lambung di masa depan adalah ....",
+                options: [
+                  "mengganti sarapan pagi dengan minum soda agar lebih bersemangat",
+                  "mengurangi konsumsi air putih dan memperbanyak makanan pedas",
+                  "makan secara teratur dan menghindari makanan yang terlalu merangsang asam lambung",
+                  "tidur segera setelah makan dalam jumlah yang sangat banyak"
+                ],
+                answer: 2
+              },
+              {
+                text: "Secara geografis, Indonesia terletak di antara dua benua yaitu Benua Asia dan Benua Australia, serta di antara dua samudra yaitu Samudra Hindia dan Samudra Pasifik. Posisi ini menempatkan Indonesia pada jalur persilangan lalu lintas perdagangan dunia yang sangat ramai. Kapal-kapal dari berbagai negara sering kali melewati perairan Indonesia untuk menuju ke negara tujuan. Hal ini memberikan peluang besar bagi masyarakat Indonesia untuk berinteraksi dengan berbagai bangsa dari seluruh dunia.\n\nKeuntungan utama yang didapatkan bangsa Indonesia dari letak geografisnya dalam bidang ekonomi adalah ....",
+                options: [
+                  "menjadi pusat penelitian antariksa dunia",
+                  "meningkatkan potensi sebagai jalur perdagangan internasional",
+                  "mengurangi jumlah penduduk yang melakukan urbanisasi",
+                  "memudahkan proses ekspor mineral ke luar angkasa"
+                ],
+                answer: 1
+              },
+              {
+                text: "Di sebuah padang rumput, terdapat seekor kerbau yang sedang mencari makan. Di atas punggung kerbau tersebut, hinggap beberapa burung jalak. Burung jalak mematuki kutu-kutu yang ada di kulit kerbau. Kerbau merasa senang karena rasa gatal akibat kutu berkurang, sementara burung jalak merasa kenyang karena mendapatkan makanan. Interaksi ini menunjukkan betapa makhluk hidup saling membutuhkan untuk bertahan hidup di alam liar.\n\nPola interaksi antara burung jalak dan kerbau tersebut merupakan contoh simbiosis mutualisme karena ....",
+                options: [
+                  "kedua makhluk hidup tersebut mendapatkan keuntungan dari interaksi tersebut",
+                  "kerbau mendapatkan keuntungan dan burung jalak tidak terpengaruh",
+                  "burung jalak merugikan kerbau dengan mengambil makanannya",
+                  "burung jalak menumpang hidup pada kerbau tanpa memberi imbalan"
+                ],
+                answer: 0
+              },
+
+              // --- PKLH PG ---
+              {
+                text: "Perhatikan pernyataan berikut!\n1. Sebagai ruang terbuka hijau.\n2. Meningkatkan kualitas hidup dengan memberikan suasana yang asri.\n3. Membantu mengurangi polusi.\n4. Menjaga kelestarian tanah dan air.\n\nYang merupakan fungsi sosial hutan kota adalah ….",
+                options: [
+                  "1 dan 2",
+                  "2 dan 3",
+                  "3 dan 4",
+                  "1 dan 4"
+                ],
+                answer: 0
+              },
+              {
+                text: "Terletak di daerah pantai dan pesisir. Memiliki tekstur yang kasar. Kesuburan tanah rendah dan mudah mengalami erosi. Cocok ditanami tanaman yang tahan kekeringan dan tahan terhadap tanah yang miskin hara.\n\nTanah yang sesuai dengan ciri-ciri di atas adalah ….",
+                options: [
+                  "Tanah aluvial",
+                  "Tanah gambut",
+                  "Tanah podsolik merah kuning",
+                  "Tanah Pasir"
+                ],
+                answer: 3
+              },
+              {
+                text: "Sarana toilet di sekolah harus memenuhi syarat kesehatan, salah satunya yaitu perbandingan ideal jumlah toilet di sekolah dengan jumlah murid adalah 1:25 untuk murid perempuan dan 1:40 untuk murid laki-laki. Jika di suatu sekolah terdapat 95 siswa perempuan dan 70 siswa laki-laki, maka toilet yang dibutuhkan adalah ….",
+                options: [
+                  "4",
+                  "5",
+                  "6",
+                  "7"
+                ],
+                answer: 2
+              },
+              {
+                text: "Kota Balikpapan memiliki kawasan pesisir yang ditumbuhi oleh hutan mangrove (bakau), salah satunya di daerah Kariangau dan Margomulyo. Hutan mangrove ini memiliki peran ekologis yang sangat penting. Selain menjadi tempat hidup bagi berbagai jenis kepiting, ikan, dan burung, kawasan ini dihuni oleh primata endemik Kalimantan yang dilindungi, yaitu Bekantan (Nasalis larvatus) yang memiliki ciri khas hidung panjang.\n\nMengapa keberadaan tumbuhan bakau (mangrove) di pesisir pantai Balikpapan sangat penting bagi perlindungan lingkungan pantai?",
+                options: [
+                  "Akar bakau yang kuat dapat menahan abrasi air laut dan melindungi garis pantai dari hantaman ombak.",
+                  "Daun bakau yang gugur dapat diolah langsung menjadi bahan bakar minyak untuk kendaraan bermotor.",
+                  "Pohon mangrove dapat menghasilkan buah manis yang bisa dikonsumsi langsung oleh warga sekitar.",
+                  "Hutan mangrove membuat air laut menjadi tawar sehingga bisa digunakan untuk mandi."
+                ],
+                answer: 0
+              },
+              {
+                text: "Di dekat sebuah pemukiman padat penduduk, terdapat sungai yang airnya tampak berwarna kehitaman dan mengeluarkan bau yang sangat menyengat. Di beberapa titik, terlihat tumpukan sampah plastik dan limbah rumah tangga mengapung. Warga sekitar melaporkan bahwa beberapa pabrik tahu di dekat sana juga membuang sisa air cucian produksinya langsung ke sungai tanpa diolah terlebih dahulu. Akibatnya, ikan-ikan di sungai tersebut banyak yang mati dan airnya sudah tidak bisa digunakan untuk keperluan mandi atau mencuci.\n\nBerdasarkan wacana di atas, jenis pencemaran lingkungan apa yang sedang terjadi di sungai tersebut dan apa penyebab utamanya?",
+                options: [
+                  "Pencemaran udara, disebabkan oleh asap pembakaran sampah rumah tangga di pinggir sungai.",
+                  "Pencemaran suara, disebabkan oleh suara mesin pabrik tahu yang bising setiap hari.",
+                  "Pencemaran air, disebabkan oleh pembuangan limbah rumah tangga dan limbah cair pabrik tanpa pengolahan.",
+                  "Pencemaran tanah, disebabkan oleh tumpukan sampah plastik di sekitar bantaran sungai."
+                ],
+                answer: 2
+              },
+
+              // --- PILIHAN GANDA KOMPLEKS (PGK) ---
+              {
+                type: "multiple",
+                text: "Sebagai pejuang kemerdekaan sekaligus pendiri bangsa, para perumus Pancasila memiliki karakter teladan yang dapat kita contoh sebagai generasi penerus bangsa. Pilihlah jawaban pada sikap yang sesuai dengan karakter teladan para perumus Pancasila",
+                options: [
+                  "Mementingkan kepentingan bersama diatas kepentingan kepentingan pribadi",
+                  "Menolak hasil musyawarah yang tidak sesuai dengan keinginan",
+                  "Menghargai tetangga sehingga dapat hidup dengan damai",
+                  "Membiarkan lingkungan kotor dan tidak terawat"
+                ],
+                answer: [0, 2]
+              },
+              {
+                type: "multiple",
+                text: "Kancil melihat Kerbau tertindih batang pohon yang tumbang. Meskipun Kerbau pernah mengejek Kancil karena tubuhnya yang kecil, Kancil tidak menyimpan dendam. Ia segera memanggil teman-teman hewan lainnya untuk membantu mengangkat batang pohon tersebut. Kerbau akhirnya selamat dan meminta maaf kepada Kancil atas kesombongannya selama ini.\n\nPelajaran hidup yang dapat dipetik dari cerita fabel di atas adalah .... (Pilihlah dua jawaban benar)",
+                options: [
+                  "Jangan menyimpan dendam terhadap orang yang pernah menyakiti kita",
+                  "Kekuatan fisik adalah hal terpenting dalam menolong sesama",
+                  "Memaafkan kesalahan orang lain adalah perbuatan yang mulia",
+                  "Lebih baik membalas ejekan teman agar mereka merasa jera"
+                ],
+                answer: [0, 2]
+              },
+              {
+                type: "multiple",
+                text: "Sebuah toko roti memiliki standar resep: untuk membuat 5 buah roti dibutuhkan 2 kg tepung terigu. Pemilik toko membuat tabel untuk membantu karyawan menghitung kebutuhan tepung jika pesanan roti meningkat.\n\nPasangan jumlah roti dan kebutuhan tepung yang senilai dengan rasio tersebut adalah ....",
+                options: [
+                  "10 roti membutuhkan 4 kg tepung",
+                  "15 roti membutuhkan 8 kg tepung",
+                  "20 roti membutuhkan 10 kg tepung",
+                  "25 roti membutuhkan 12 kg tepung"
+                ],
+                answer: [0]
+              },
+              {
+                type: "multiple",
+                text: "Paru-paru adalah organ utama dalam sistem pernapasan manusia. Di dalam paru-paru terjadi pertukaran oksigen dari udara dengan karbon dioksida dari darah. Proses ini terjadi di bagian yang disebut alveolus. Oksigen sangat dibutuhkan oleh sel-sel tubuh untuk menghasilkan energi. Jika paru-paru terganggu akibat polusi atau rokok, maka suplai oksigen ke seluruh tubuh akan terhambat, yang dapat menyebabkan berbagai penyakit serius.\n\nPernyataan berikut yang benar mengenai fungsi dan upaya menjaga kesehatan paru-paru adalah ....",
+                options: [
+                  "Menghirup asap rokok secara pasif tidak berbahaya bagi kesehatan paru-paru",
+                  "Alveolus berfungsi sebagai tempat pertukaran oksigen dan karbon dioksida.",
+                  "Olahraga rutin membantu meningkatkan kapasitas paru-paru dalam menyerap oksigen.",
+                  "Karbon dioksida diserap oleh tubuh untuk membantu proses pencernaan makanan."
+                ],
+                answer: [1, 2]
+              },
+              {
+                type: "multiple",
+                text: "Manakah di antara pernyataan berikut yang merupakan akibat atau dampak yang ditimbulkan dari pencemaran udara?",
+                options: [
+                  "Timbulnya berbagai gangguan kesehatan pernapasan seperti ISPA, batuk, dan sesak napas.",
+                  "Air sumur warga berubah menjadi jernih dan layak untuk dikonsumsi langsung setiap hari.",
+                  "Menurunnya jarak pandang akibat kabut asap tebal yang mengganggu aktivitas transportasi.",
+                  "Menyuburkan pertumbuhan tanaman hijau dan memperkaya unsur hara di dalam tanah secara alami."
+                ],
+                answer: [0, 2]
+              }
+            ]
+          }
+        };
+
+        // --- STATE VARIABLES ---
+        let currentScreen = 'login';
+        let userData = { name: '', school: '', packageKey: 'lcc_1' };
+        let activeQuestions = []; // Menyimpan urutan soal yang diacak khusus untuk peserta ini
+        let answers = {};
+        let currentQIndex = 0;
+        let timeLeft = 0;
+        let timerInterval;
+        let lastResult = null;
+        const STORAGE_KEY = 'lcc_balteng_2026_saved_state_cc_v2';
+        const preloadedImages = {};
+
+        function saveAppState() {
+            try {
+                const stateToSave = {
+                    currentScreen,
+                    userData,
+                    activeQuestions,
+                    answers,
+                    currentQIndex,
+                    timeLeft,
+                    lastResult
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+            } catch (e) {
+                console.warn('Gagal menyimpan progres ke penyimpanan lokal:', e);
+            }
+        }
+
+        function clearAppState() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {
+                console.warn('Gagal menghapus penyimpanan lokal:', e);
+            }
+        }
+
+        function populateDashboardUI() {
+            const pkg = soalPackages[userData.packageKey] || soalPackages.lcc_1;
+            document.getElementById('dash-name').textContent = userData.name;
+            document.getElementById('dash-school').textContent = userData.school;
+            document.getElementById('dash-package').textContent = pkg.title;
+            document.getElementById('dash-count').textContent = pkg.questions.length + " Butir Soal";
+            document.getElementById('dash-time').textContent = pkg.duration + " Menit";
+        }
+
+        // Fungsi pengacak array (Fisher-Yates Shuffle) dengan tetap merekam ID asli soal agar penilaian tetap akurat
+        function shuffleArray(array) {
+            const arr = array.map((item, originalIndex) => ({ ...item, originalIndex }));
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function restoreAppState() {
+            try {
+                const rawState = localStorage.getItem(STORAGE_KEY);
+                if (!rawState) return;
+
+                const saved = JSON.parse(rawState);
+                if (!saved || !saved.userData) return;
+
+                userData = {
+                    name: saved.userData.name || '',
+                    school: saved.userData.school || '',
+                    packageKey: soalPackages[saved.userData.packageKey] ? saved.userData.packageKey : 'lcc_1'
+                };
+                activeQuestions = saved.activeQuestions || [];
+                answers = saved.answers || {};
+                currentQIndex = typeof saved.currentQIndex === 'number' ? saved.currentQIndex : 0;
+                timeLeft = typeof saved.timeLeft === 'number' ? saved.timeLeft : 0;
+                lastResult = saved.lastResult || null;
+
+                // Isi kembali form login agar tidak hilang
+                document.getElementById('input-name').value = userData.name;
+                document.getElementById('input-school').value = userData.school;
+                document.getElementById('input-package').value = userData.packageKey;
+
+                if (saved.currentScreen === 'dashboard' && userData.name && userData.school) {
+                    populateDashboardUI();
+                    switchScreen('dashboard');
+                } else if ((saved.currentScreen === 'test' || saved.currentScreen === 'submitting') && userData.name && userData.school) {
+                    document.getElementById('test-header-subtitle').textContent = `${userData.name} | ${userData.school}`;
+                    switchScreen('test');
+                    renderQuestion();
+                    if (timeLeft > 0) {
+                        startTimer();
+                    } else {
+                        submitTest();
+                    }
+                } else if (saved.currentScreen === 'result' && lastResult) {
+                    showResults(lastResult.correct, lastResult.wrong, lastResult.score, lastResult.title);
+                }
+            } catch (e) {
+                console.warn('Gagal memulihkan progres ujian:', e);
+            }
+        }
+
+        function getProxyUrl(url) {
+            return `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=webp`;
+        }
+
+        function preloadAllQuestionImages() {
+            Object.values(soalPackages).forEach(pkg => {
+                pkg.questions.forEach(q => {
+                    if (q.image && !preloadedImages[q.image]) {
+                        const primaryImg = new Image();
+                        primaryImg.referrerPolicy = 'no-referrer';
+                        primaryImg.onload = () => {
+                            preloadedImages[q.image] = q.image;
+                        };
+                        primaryImg.onerror = () => {
+                            const proxyUrl = getProxyUrl(q.image);
+                            const fallbackImg = new Image();
+                            fallbackImg.onload = () => {
+                                preloadedImages[q.image] = proxyUrl;
+                            };
+                            fallbackImg.src = proxyUrl;
+                        };
+                        primaryImg.src = q.image;
+                    }
+                });
+            });
+        }
+
+        // --- DOM ELEMENTS ---
+        const screens = {
+            login: document.getElementById('screen-login'),
+            dashboard: document.getElementById('screen-dashboard'),
+            test: document.getElementById('screen-test'),
+            submitting: document.getElementById('screen-submitting'),
+            result: document.getElementById('screen-result')
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.getElementById('input-package');
+            for (const [key, pkg] of Object.entries(soalPackages)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = pkg.title;
+                select.appendChild(option);
+            }
+
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+
+            ['input-name', 'input-school', 'input-package'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    userData.name = document.getElementById('input-name').value;
+                    userData.school = document.getElementById('input-school').value;
+                    userData.packageKey = document.getElementById('input-package').value;
+                    saveAppState();
+                });
+            });
+            
+            preloadAllQuestionImages();
+            restoreAppState();
+            lucide.createIcons();
+        });
+
+        // --- CORE FUNCTIONS ---
+        function switchScreen(newScreen) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[newScreen].classList.remove('hidden');
+            currentScreen = newScreen;
+            saveAppState();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            userData.name = document.getElementById('input-name').value;
+            userData.school = document.getElementById('input-school').value;
+            userData.packageKey = document.getElementById('input-package').value;
+
+            populateDashboardUI();
+            switchScreen('dashboard');
+        }
+
+        function startTest() {
+            const pkg = soalPackages[userData.packageKey];
+            timeLeft = pkg.duration * 60;
+            answers = {};
+            currentQIndex = 0;
+            lastResult = null;
+            
+            // Acak urutan soal secara unik untuk peserta ini
+            activeQuestions = shuffleArray(pkg.questions);
+
+            document.getElementById('test-header-subtitle').textContent = `${userData.name} | ${userData.school}`;
+            
+            switchScreen('test');
+            renderQuestion();
+            startTimer();
+            saveAppState();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                saveAppState();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeLeft = 0;
+                    updateTimerDisplay();
+                    submitTest();
+                } else {
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            const mStr = m.toString().padStart(2, '0');
+            const sStr = s.toString().padStart(2, '0');
+            if (h > 0) {
+                return `${h.toString().padStart(2, '0')}:${mStr}:${sStr}`;
+            }
+            return `${mStr}:${sStr}`;
+        }
+
+        function updateTimerDisplay() {
+            const el = document.getElementById('timer-text');
+            const icon = document.getElementById('timer-icon');
+            el.textContent = formatTime(timeLeft);
+            if (timeLeft < 300) {
+                el.classList.add('text-red-400');
+                el.classList.remove('text-white');
+                icon.classList.add('text-red-400', 'animate-pulse');
+                icon.classList.remove('text-blue-200');
+            } else {
+                el.classList.remove('text-red-400');
+                el.classList.add('text-white');
+                icon.classList.remove('text-red-400', 'animate-pulse');
+                icon.classList.add('text-blue-200');
+            }
+        }
+
+        function renderQuestion() {
+            if (!activeQuestions || activeQuestions.length === 0) {
+                const pkg = soalPackages[userData.packageKey];
+                activeQuestions = shuffleArray(pkg.questions);
+            }
+
+            const q = activeQuestions[currentQIndex];
+            const isMultiple = q.type === 'multiple';
+
+            document.getElementById('q-number').textContent = `Soal Nomor ${currentQIndex + 1}`;
+            
+            const badge = document.getElementById('q-badge');
+            if(isMultiple) badge.classList.remove('hidden'); else badge.classList.add('hidden');
+
+            const imgContainer = document.getElementById('q-image-container');
+            const imgEl = document.getElementById('q-image');
+            const imgLoader = document.getElementById('q-image-loader');
+
+            if (q.image) {
+                imgContainer.classList.remove('hidden');
+                const targetSrc = preloadedImages[q.image] || q.image;
+
+                if (imgEl.dataset.questionImg !== q.image) {
+                    imgEl.dataset.questionImg = q.image;
+
+                    if (preloadedImages[q.image]) {
+                        imgLoader.classList.add('hidden');
+                        imgEl.classList.remove('hidden');
+                        imgEl.src = preloadedImages[q.image];
+                    } else {
+                        imgLoader.classList.remove('hidden');
+                        imgEl.classList.add('hidden');
+
+                        imgEl.onload = () => {
+                            preloadedImages[q.image] = imgEl.src;
+                            imgLoader.classList.add('hidden');
+                            imgEl.classList.remove('hidden');
+                        };
+
+                        imgEl.onerror = () => {
+                            const proxyUrl = getProxyUrl(q.image);
+                            if (imgEl.src !== proxyUrl) {
+                                imgEl.src = proxyUrl;
+                            } else {
+                                imgEl.onerror = null;
+                                imgLoader.classList.add('hidden');
+                                imgEl.classList.remove('hidden');
+                                imgEl.src = 'https://placehold.co/600x350/e2e8f0/475569?text=Gambar+Tidak+Dapat+Dimuat';
+                            }
+                        };
+
+                        imgEl.src = targetSrc;
+                    }
+                }
+            } else {
+                imgContainer.classList.add('hidden');
+                imgLoader.classList.add('hidden');
+                imgEl.dataset.questionImg = '';
+                imgEl.removeAttribute('src');
+            }
+
+            document.getElementById('q-text').textContent = q.text;
+
+            const optionsContainer = document.getElementById('q-options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                let isChecked = false;
+                if(isMultiple) {
+                    isChecked = (answers[currentQIndex] || []).includes(idx);
+                } else {
+                    isChecked = answers[currentQIndex] === idx;
+                }
+
+                const label = document.createElement('label');
+                label.className = `flex items-start p-4 border rounded-xl cursor-pointer transition-all duration-200 ${isChecked ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`;
+                
+                const inputType = isMultiple ? 'checkbox' : 'radio';
+                const roundedClass = isMultiple ? 'rounded' : 'rounded-full';
+                const checkedAttr = isChecked ? 'checked' : '';
+
+                label.innerHTML = `
+                    <div class="flex items-center h-5">
+                        <input type="${inputType}" name="question-${currentQIndex}" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-slate-300 ${roundedClass}" ${checkedAttr} onchange="handleAnswerChange(${currentQIndex}, ${idx}, ${isMultiple})">
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-bold text-slate-700 mr-2 uppercase">${String.fromCharCode(65 + idx)}.</span>
+                        <span class="text-slate-700 leading-relaxed">${opt}</span>
+                    </div>
+                `;
+                optionsContainer.appendChild(label);
+            });
+
+            document.getElementById('btn-prev').disabled = currentQIndex === 0;
+            
+            if (currentQIndex === activeQuestions.length - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-finish').classList.replace('hidden', 'flex');
+            } else {
+                document.getElementById('btn-next').classList.replace('hidden', 'flex');
+                document.getElementById('btn-finish').classList.add('hidden');
+            }
+
+            renderGrid();
+        }
+
+        window.handleAnswerChange = function(qIndex, optionIndex, isMultiple) {
+            if (isMultiple) {
+                let currentArr = answers[qIndex] || [];
+                if (currentArr.includes(optionIndex)) {
+                    currentArr = currentArr.filter(i => i !== optionIndex);
+                } else {
+                    currentArr.push(optionIndex);
+                }
+                answers[qIndex] = currentArr;
+            } else {
+                answers[qIndex] = optionIndex;
+            }
+            saveAppState();
+            renderQuestion();
+        }
+
+        window.prevQuestion = function() {
+            if (currentQIndex > 0) {
+                currentQIndex--;
+                saveAppState();
+                renderQuestion();
+            }
+        }
+
+        window.nextQuestion = function() {
+            if (currentQIndex < activeQuestions.length - 1) {
+                currentQIndex++;
+                saveAppState();
+                renderQuestion();
+            }
+        }
+
+        window.jumpToQuestion = function(idx) {
+            currentQIndex = idx;
+            saveAppState();
+            renderQuestion();
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('q-grid');
+            gridContainer.innerHTML = '';
+
+            let answeredCount = 0;
+
+            activeQuestions.forEach((q, idx) => {
+                const hasAnswer = Array.isArray(answers[idx]) 
+                  ? answers[idx].length > 0 
+                  : answers[idx] !== undefined;
+
+                if (hasAnswer) answeredCount++;
+
+                let statusClass = "bg-white border-slate-300 text-slate-700 hover:bg-slate-100";
+                if (hasAnswer) statusClass = "bg-green-500 border-green-600 text-white shadow-sm";
+                if (idx === currentQIndex) statusClass = "bg-blue-600 border-blue-700 text-white shadow-md ring-2 ring-blue-300";
+
+                const btn = document.createElement('button');
+                btn.className = `h-10 w-full rounded font-medium border flex items-center justify-center transition-all ${statusClass}`;
+                btn.textContent = idx + 1;
+                btn.onclick = () => jumpToQuestion(idx);
+                gridContainer.appendChild(btn);
+            });
+
+            document.getElementById('stat-answered').textContent = `Sudah Dijawab: ${answeredCount}`;
+            document.getElementById('stat-unanswered').textContent = `Belum Dijawab: ${activeQuestions.length - answeredCount}`;
+            
+            window.unansweredFinalCount = activeQuestions.length - answeredCount;
+        }
+
+        window.showSubmitModal = function() {
+            document.getElementById('modal-unanswered').textContent = window.unansweredFinalCount;
+            document.getElementById('modal-submit').classList.remove('hidden');
+        }
+
+        window.hideSubmitModal = function() {
+            document.getElementById('modal-submit').classList.add('hidden');
+        }
+
+        // --- SUBMISSION LOGIC ---
+        window.submitTest = async function() {
+            clearInterval(timerInterval);
+            hideSubmitModal();
+            switchScreen('submitting');
+
+            const pkg = soalPackages[userData.packageKey];
+            let correct = 0;
+
+            activeQuestions.forEach((q, idx) => {
+                const userAns = answers[idx];
+                const originalCorrectAns = q.answer;
+
+                if (q.type === 'multiple') {
+                    if (Array.isArray(userAns) && Array.isArray(originalCorrectAns)) {
+                        if (userAns.length === originalCorrectAns.length && userAns.every(v => originalCorrectAns.includes(v))) {
+                            correct++;
+                        }
+                    }
+                } else {
+                    if (userAns === originalCorrectAns) correct++;
+                }
+            });
+
+            const total = activeQuestions.length;
+            const wrong = total - correct;
+            const score = Math.round((correct / total) * 100);
+
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEn4l54lWnkuWM9PbRBAlnbvYOYzrfFsOaL6NoNkqQfWqF6v8Gq5cEQfTkymiyUQBU/exec';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('waktu', new Date().toLocaleString('id-ID'));
+                formData.append('nama', userData.name);
+                formData.append('sekolah', userData.school);
+                formData.append('paket', pkg.title);
+                formData.append('benar', correct);
+                formData.append('salah', wrong);
+                formData.append('nilai', score);
+
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+            } catch (error) {
+                console.error('Data disubmit, tapi gagal tersambung ke GSheet (mungkin isu CORS).', error);
+            }
+
+            showResults(correct, wrong, score, pkg.title);
+        }
+
+        function showResults(correct, wrong, score, title) {
+            lastResult = { correct, wrong, score, title };
+            document.getElementById('res-name').textContent = userData.name;
+            document.getElementById('res-school').textContent = userData.school;
+            document.getElementById('res-package').textContent = title;
+            document.getElementById('res-correct').textContent = correct;
+            document.getElementById('res-wrong').textContent = wrong;
+            document.getElementById('res-score').textContent = score;
+
+            switchScreen('result');
+        }
+
+        window.resetApp = function() {
+            clearInterval(timerInterval);
+            userData = { name: '', school: '', packageKey: 'lcc_1' };
+            activeQuestions = [];
+            answers = {};
+            currentQIndex = 0;
+            timeLeft = 0;
+            lastResult = null;
+            clearAppState();
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-school').value = '';
+            switchScreen('login');
+        }
+
+    </script>
+</body>
+</html>
